@@ -4,7 +4,7 @@ modules = ["c-clang14", "bash", "cpp-clang14", "go-1.23", "python-base-3.12", "p
 channel = "stable-24_05"
 
 [workflows]
-runButton = "3proxy"
+runButton = "3proxy-full"
 
 [[workflows.workflow]]
 name = "3proxy"
@@ -18,3 +18,16 @@ args = "chmod +x /src/scripts/setup.sh"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "./src/scripts/setup.sh"
+
+[[workflows.workflow]]
+name = "3proxy-full"
+author = 39603852
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "chmod +x /src/scripts/setup.sh"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "/src/scripts/setup.sh"
