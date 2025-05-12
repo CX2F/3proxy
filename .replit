@@ -2,3 +2,19 @@ modules = ["c-clang14", "bash", "cpp-clang14", "go-1.23", "python-base-3.12", "p
 
 [nix]
 channel = "stable-24_05"
+
+[workflows]
+runButton = "3proxy"
+
+[[workflows.workflow]]
+name = "3proxy"
+author = 39603852
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "chmod +x /src/scripts/setup.sh"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "./src/scripts/setup.sh"
