@@ -80,5 +80,56 @@ args = "cd src && make proxy_server"
 task = "shell.exec"
 args = "cd .. && ./bin/proxy_server"
 
+[[workflows.workflow]]
+name = "Download-Data"
+author = 39603852
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd gpt2-llm.c"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python dev/data/tinyshakespeare.py"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python train_gpt2.py"
+
+[[workflows.workflow]]
+name = "Train-CPU"
+author = 39603852
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd gpt2-llm.c"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "make train_gpt2"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "OMP_NUM_THREADS=4 ./train_gpt2"
+
+[[workflows.workflow]]
+name = "Train-GPU"
+author = 39603852
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd gpt2-llm.c"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "make train_gpt2fp32cu"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "./train_gpt2fp32cu"
+
 [deployment]
 run = ["sh", "-c", "cd src && ../bin/mobile_proxy"]
