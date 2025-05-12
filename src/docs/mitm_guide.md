@@ -1,71 +1,92 @@
-# Man-in-the-Middle Configuration Guide
 
-This guide explains how to set up the 3proxy SSL Plugin for intercepting HTTPS traffic.
+# Man-in-the-Middle (MITM) Configuration Guide
 
-**Warning**: Using these techniques without proper authorization may be illegal in many jurisdictions.
+## Overview
 
-## Requirements
+This guide explains how to configure 3proxy as a MITM proxy to decrypt and inspect HTTPS traffic for debugging, content filtering, or security analysis.
 
-- 3proxy compiled with SSL support
-- OpenSSL for certificate generation
-- Root certificate installed on client devices
+⚠️ **IMPORTANT**: Using MITM techniques without proper authorization may violate privacy laws and terms of service. Use only in controlled environments with proper consent.
 
-## Setup
+## Prerequisites
 
-1. Generate a CA certificate and key:
+- OpenSSL (included in the setup)
+- SSLPlugin for 3proxy (included in this build)
+
+## Setup Instructions
+
+### 1. Generate CA Certificate
 
 ```bash
-openssl genrsa -out ca.key 4096
-openssl req -new -x509 -days 3650 -key ca.key -out ca.crt -subj "/CN=MobileProxy CA"
+# Generate CA private key
+openssl genrsa -out /certs/ca.key 4096
+
+# Generate CA certificate
+openssl req -new -x509 -key /certs/ca.key -out /certs/ca.crt -days 3650 -subj "/CN=Mobile Proxy CA"
 ```
 
-2. Add the following to your 3proxy.cfg:
+### 2. Configure SSLPlugin
+
+Add these lines to your `3proxy.cfg` file:
 
 ```
+# Load SSL plugin
 plugin /plugins/SSLPlugin.so ssl_plugin
+
+# Configure MITM settings
 ssl_mitm
-ssl_certcache /certs/cache/
-ssl_server_ca_file /certs/ca.crt
-ssl_server_ca_key /certs/ca.key
+ssl_addca /certs/ca.crt
+ssl_addhostname *.example.com
+
+# Start MITM proxy
+proxy -p8443
 ```
 
-3. Restart 3proxy
+### 3. Install CA Certificate on Mobile Devices
 
-## Client Setup
+#### Android:
 
-### Android
+1. Download the CA certificate to your device
+2. Go to Settings → Security → Install from storage
+3. Find and select the downloaded CA certificate
+4. Name the certificate and select "VPN and apps" for credential use
 
-1. Download the ca.crt file to your device
-2. Go to Settings → Security → Encryption & Credentials
-3. Tap "Install a certificate" → CA Certificate
-4. Select the downloaded ca.crt file
-5. Follow the prompts to install
+#### iOS:
 
-### iOS
-
-1. Email the ca.crt file to yourself
-2. Open the attachment on your iOS device
+1. Email the CA certificate to yourself or host it on a website
+2. Open the file on your iOS device
 3. Go to Settings → Profile Downloaded
-4. Tap "Install" and follow the prompts
+4. Install the CA certificate
 5. Go to Settings → General → About → Certificate Trust Settings
-6. Enable full trust for the installed certificate
+6. Enable full trust for the CA certificate
 
-## Testing
+## MITM Proxy Usage Examples
 
-1. Configure your device to use the proxy (port 8443)
-2. Visit https://example.com in your browser
-3. Check the certificate details - it should be signed by your CA
+### Content Filtering
 
-## Analyzing Traffic
-
-For mobile traffic analysis:
-
-1. Enable detailed logging in 3proxy.cfg:
 ```
-log /logs/ssl-%y%m%d.log D
-logformat "L%C - %U [%t] \"%T\" %E %I %h %T %{User-Agent}"
+# Block certain domains
+ssl_addhostname *.example.com,*.ads.com block
+
+# Redirect sites
+ssl_addhostname banking.example.com redirect https://safe.example.com
 ```
 
-2. Use grep to filter mobile-specific traffic:
-```bash
-grep -i "android\|iphone\|mobile" /logs/ssl-*.log
+### Traffic Analysis
+
+```
+# Log all HTTPS traffic
+ssl_logdump /logs/ssl_dump_%y%m%d.log
+```
+
+### Mobile App Debugging
+
+```
+# Intercept specific app traffic
+ssl_addhostname api.example.com debug
+```
+
+## Troubleshooting
+
+- **Certificate Warnings**: Ensure the CA certificate is properly installed on client devices
+- **Connection Failures**: Some apps use certificate pinning and will reject MITM certificates
+- **Performance Issues**: MITM proxying requires more CPU resources; reduce the number of concurrent connections for mobile devices

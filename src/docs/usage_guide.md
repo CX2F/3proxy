@@ -1,57 +1,64 @@
-# Mobile-Optimized 3Proxy Usage Guide
 
-This guide will help you set up and use the mobile-optimized version of 3Proxy.
+# Mobile-Optimized 3proxy Usage Guide
+
+## Overview
+
+This is a mobile-optimized deployment of 3proxy, a tiny proxy server. The configuration has been specially tuned for mobile connections, with reduced bandwidth consumption and improved latency.
 
 ## Available Services
 
-- **HTTP Proxy**: Port 8080
-- **SOCKS5 Proxy**: Port 1080
-- **HTTPS Proxy with SSL**: Port 8443
-- **Tor Proxy**: Port 9050
+| Service | Port | Description |
+|---------|------|-------------|
+| SOCKS5  | 5000 | SOCKS proxy with TCP optimization for mobile |
+| HTTP(S) | 8080 | HTTP proxy with compression support |
+| DNS     | 5353 | Low-bandwidth DNS caching proxy |
+| TCP Map | 2222 | SSH access through firewall (example) |
+| UDP Map | 5400 | Voice/video calls through firewall |
 
-## Mobile Client Configuration
+## Authentication
+
+Default credentials:
+- Username: `admin`
+- Password: `mobileproxy2024`
+
+## Mobile Client Setup
 
 ### Android
 
-1. Go to Settings → Wi-Fi
-2. Long-press your connected network
-3. Select "Modify Network"
-4. Check "Show advanced options"
-5. Change Proxy settings to "Manual"
-6. Enter the server IP and port 8080
-7. Save the configuration
+1. **SOCKS Proxy**:
+   - Install "Proxy Settings" app
+   - Set host to your Replit URL
+   - Set port to 5000
+   - Enable authentication and enter credentials
+
+2. **HTTP Proxy**:
+   - Go to WiFi settings
+   - Long press your connection
+   - Select "Modify network"
+   - Set proxy to "Manual"
+   - Enter host and port 8080
+   - Enter username and password
 
 ### iOS
 
-1. Go to Settings → Wi-Fi
-2. Tap the (i) icon next to your connected network
-3. Scroll down to "HTTP Proxy" and select "Manual"
-4. Enter the server IP and port 8080
-5. Leave Authentication blank or enter admin/mobileproxy if required
+1. **HTTP Proxy**:
+   - Go to Settings → Wi-Fi
+   - Tap the (i) icon next to your network
+   - Scroll down to "HTTP Proxy"
+   - Set to "Manual"
+   - Enter server and port 8080
+   - Enable Authentication
+   - Enter username and password
 
-### Mobile Apps
+## Bandwidth Optimization Tips
 
-For apps that don't use system proxy settings:
+- Use the DNS proxy (port 5353) to reduce DNS lookup latency
+- Enable compression in your HTTP clients when available
+- For mobile web browsing, the HTTP proxy (8080) is more efficient than SOCKS
+- Use the TCP/UDP port mapping for specific applications to bypass app-level proxy settings
 
-1. Install a VPN app like "HTTP Injector" or "Proxifier"
-2. Configure the VPN to use our SOCKS5 proxy (port 1080)
-3. Enable the VPN to route all traffic through our proxy
+## Security Notes
 
-## Optimizations
-
-This 3proxy build includes:
-
-- TCP optimization for mobile connections
-- Buffer size optimization (16KB for mobile)
-- Fast DNS lookups with caching
-- SSL support for encrypted connections
-- Tor integration for anonymous browsing
-
-## Troubleshooting
-
-If you experience connection issues:
-
-1. Check that the proxy server is running
-2. Verify the correct IP and port in your configuration
-3. Try different ports (8080, 1080, 8443)
-4. Make sure the proxy is reachable from your network
+- Change the default password in `/etc/3proxy/passwd`
+- Enable SSL for sensitive connections
+- The proxy logs all connections by default in `/logs/`

@@ -4,7 +4,7 @@ modules = ["c-clang14", "bash", "cpp-clang14", "go-1.23", "python-base-3.12", "p
 channel = "stable-24_05"
 
 [workflows]
-runButton = "3proxy-mobile"
+runButton = "Mobile-Proxy"
 
 [[workflows.workflow]]
 name = "3proxy"
@@ -45,5 +45,18 @@ args = "chmod +x /src/scripts/setup.sh"
 task = "shell.exec"
 args = "/src/scripts/setup.sh"
 
+[[workflows.workflow]]
+name = "Mobile-Proxy"
+author = 39603852
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd src && g++ -std=c++11 -Wall -pthread mobile_proxy.cpp -o ../bin/mobile_proxy"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "../bin/mobile_proxy"
+
 [deployment]
-run = ["sh", "-c", "3proxy /src/config/3proxy.cfg"]
+run = ["sh", "-c", "cd src && ../bin/mobile_proxy"]
