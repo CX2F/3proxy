@@ -45,3 +45,32 @@ echo "  python main.py --sample-data  # To create sample data"
 echo "  python main.py --process      # To process and structure data"
 echo "  python main.py --train        # To train the model"
 echo "  python main.py --classify     # To classify data using GPT-4o (requires API key)"
+#!/bin/bash
+# /setup.sh
+
+# Make script executable
+chmod +x *.py *.sh
+
+# Create necessary directories
+mkdir -p data
+mkdir -p trained/model
+mkdir -p generated_images
+mkdir -p assets
+mkdir -p models
+mkdir -p output
+
+# Install requirements
+pip install -r requirements.txt
+
+# Download models
+python download_models.py
+
+# Create sample data
+python run_pipeline.py --sample-data
+
+echo "Setup completed successfully!"
+echo "You can now run the following commands:"
+echo "  python run_pipeline.py --process   # To process and structure data"
+echo "  python run_pipeline.py --train     # To train the model"
+echo "  python run_pipeline.py --generate-images   # To generate images using diffusion models"
+echo "  python run_pipeline.py --chat      # To chat with an LLM"

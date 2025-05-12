@@ -1,8 +1,83 @@
-modules = ["c-clang14", "bash", "cpp-clang14", "go-1.23", "python-base-3.12", "postgresql-16", "web"]
+
+run = "bash setup.sh && python run_pipeline.py --all"
+entrypoint = "main.py"
+
+[env]
+PYTHONPATH = "${PYTHONPATH}:${workspaceDir}"
+PATH = "${PATH}:${workspaceDir}"
 
 [nix]
-channel = "stable-24_05"
-packages = ["ipscan"]
+channel = "stable-23_05"
+
+[packager]
+language = "python"
+ignoredPackages = ["*"]
+
+[packager.features]
+enabledForHosting = true
+packageSearch = false
+guessImports = false
+
+[gitHubImport]
+requiredFiles = [".replit", "replit.nix"]
+
+[deployment]
+run = ["python", "main.py"]
+deploymentTarget = "cloudrun"
+
+[languages.python]
+pattern = "**/*.py"
+syntax = "python"
+
+[languages.python.languageServer]
+start = "pylsp"
+
+[unitTest]
+language = "python"
+
+[debugger]
+support = true
+
+[debugger.interactive]
+transport = "localhost:0"
+startCommand = ["dap-python", "main.py"]
+
+[debugger.interactive.integratedAdapter]
+dapTcpAddress = "localhost:0"
+
+[debugger.interactive.initializeMessage]
+command = "initialize"
+type = "request"
+
+[debugger.interactive.initializeMessage.arguments]
+adapterID = "debugpy"
+clientID = "replit"
+clientName = "replit.com"
+columnsStartAt1 = true
+linesStartAt1 = true
+locale = "en-us"
+pathFormat = "path"
+supportsInvalidatedEvent = true
+supportsProgressReporting = true
+supportsRunInTerminalRequest = true
+supportsVariablePaging = true
+supportsVariableType = true
+
+[debugger.interactive.launchMessage]
+command = "launch"
+type = "request"
+
+[debugger.interactive.launchMessage.arguments]
+console = "externalTerminal"
+cwd = "."
+debugOptions = []
+program = "./main.py"
+request = "launch"
+type = "python"
+
+[auth]
+pageEnabled = false
+buttonEnabled = false
 
 [workflows]
 runButton = "Process-and-Train"
@@ -138,7 +213,7 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python main.py --setup --sample-data --process --train"
+args = "python run_pipeline.py --process --train"
 
 [[workflows.workflow]]
 name = "Process-Data"
@@ -158,5 +233,11 @@ mode = "sequential"
 task = "shell.exec"
 args = "python main.py --classify"
 
-[deployment]
-run = ["sh", "-c", "cd src && ../bin/mobile_proxy"]
+[[workflows.workflow]]
+name = "Interactive-Chat"
+author = 39603852
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python run_pipeline.py --chat"
