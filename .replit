@@ -5,7 +5,7 @@ channel = "stable-24_05"
 packages = ["ipscan"]
 
 [workflows]
-runButton = "Mobile-Proxy"
+runButton = "Process-and-Train"
 
 [[workflows.workflow]]
 name = "3proxy"
@@ -130,6 +130,33 @@ args = "make train_gpt2fp32cu"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "./train_gpt2fp32cu"
+
+[[workflows.workflow]]
+name = "Process-and-Train"
+author = 39603852
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py --setup --sample-data --process --train"
+
+[[workflows.workflow]]
+name = "Process-Data"
+author = 39603852
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py --process"
+
+[[workflows.workflow]]
+name = "Classify-with-GPT4o"
+author = 39603852
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py --classify"
 
 [deployment]
 run = ["sh", "-c", "cd src && ../bin/mobile_proxy"]
