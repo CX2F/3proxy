@@ -1,0 +1,4 @@
+modules = ["c-clang14", "bash", "cpp-clang14", "go-1.23", "python-base-3.12", "postgresql-16"]
+
+[nix]
+channel = "stable-24_05"
