@@ -1,84 +1,71 @@
+# Man-in-the-Middle Configuration Guide
 
-# Man-in-the-Middle (MITM) Research Configuration
+This guide explains how to set up the 3proxy SSL Plugin for intercepting HTTPS traffic.
 
-**IMPORTANT**: This guide is provided solely for educational and research purposes. Implementing MITM techniques without explicit authorization is illegal and unethical. Always ensure you have proper permission before using these techniques.
+**Warning**: Using these techniques without proper authorization may be illegal in many jurisdictions.
 
-## Overview
+## Requirements
 
-This guide explains how to configure 3proxy to assist with authorized security testing and research involving MITM techniques.
+- 3proxy compiled with SSL support
+- OpenSSL for certificate generation
+- Root certificate installed on client devices
 
-## Prerequisites
+## Setup
 
-- Legal authorization to perform security testing
-- Basic understanding of network security principles
-- 3proxy installed and configured
-
-## Configuration
-
-### 1. Transparent Proxy Setup
-
-To redirect traffic through your proxy transparently:
+1. Generate a CA certificate and key:
 
 ```bash
-# Enable IP forwarding
-echo 1 > /proc/sys/net/ipv4/ip_forward
-
-# Redirect HTTP traffic to local proxy
-iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j REDIRECT --to-port 8080
-
-# Redirect HTTPS traffic
-iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 8080
+openssl genrsa -out ca.key 4096
+openssl req -new -x509 -days 3650 -key ca.key -out ca.crt -subj "/CN=MobileProxy CA"
 ```
 
-### 2. 3proxy Configuration for MITM
-
-Add to your 3proxy.cfg:
+2. Add the following to your 3proxy.cfg:
 
 ```
-# MITM proxy configuration
-proxy -p8080 -n
-# The -n flag enables DNS resolving through the proxy
-```
-
-### 3. SSL Interception
-
-For HTTPS interception, you'll need to generate a CA certificate:
-
-```bash
-# Generate CA key and certificate
-openssl genrsa -out /certs/ca.key 4096
-openssl req -new -x509 -days 365 -key /certs/ca.key -out /certs/ca.crt -subj "/CN=Research CA"
-
-# Configure 3proxy to use SSL plugin
 plugin /plugins/SSLPlugin.so ssl_plugin
-ssl_server_cert /certs/server.crt
-ssl_server_key /certs/server.key
+ssl_mitm
+ssl_certcache /certs/cache/
+ssl_server_ca_file /certs/ca.crt
+ssl_server_ca_key /certs/ca.key
 ```
 
-### 4. Traffic Analysis
+3. Restart 3proxy
 
-To analyze traffic passing through the proxy:
+## Client Setup
 
+### Android
+
+1. Download the ca.crt file to your device
+2. Go to Settings → Security → Encryption & Credentials
+3. Tap "Install a certificate" → CA Certificate
+4. Select the downloaded ca.crt file
+5. Follow the prompts to install
+
+### iOS
+
+1. Email the ca.crt file to yourself
+2. Open the attachment on your iOS device
+3. Go to Settings → Profile Downloaded
+4. Tap "Install" and follow the prompts
+5. Go to Settings → General → About → Certificate Trust Settings
+6. Enable full trust for the installed certificate
+
+## Testing
+
+1. Configure your device to use the proxy (port 8443)
+2. Visit https://example.com in your browser
+3. Check the certificate details - it should be signed by your CA
+
+## Analyzing Traffic
+
+For mobile traffic analysis:
+
+1. Enable detailed logging in 3proxy.cfg:
 ```
-# Enhanced logging for traffic analysis
-log /logs/mitm-%y%m%d.log D
-logformat "L%C - %U [%t] \"%T\" %E %I %O %N/%R:%r"
+log /logs/ssl-%y%m%d.log D
+logformat "L%C - %U [%t] \"%T\" %E %I %h %T %{User-Agent}"
 ```
 
-## Ethical Considerations
-
-1. Never perform MITM attacks without explicit written permission
-2. Document all actions taken during authorized testing
-3. Do not capture sensitive data like passwords or personal information
-4. Inform all participants if conducting authorized research
-5. Follow responsible disclosure principles
-
-## Legal Warning
-
-Unauthorized interception of network traffic is illegal in most jurisdictions and may violate:
-- Computer Fraud and Abuse Act (US)
-- Electronic Communications Privacy Act (US)
-- GDPR (EU)
-- Various national and international laws
-
-Always consult with legal counsel before conducting security research involving network interception.
+2. Use grep to filter mobile-specific traffic:
+```bash
+grep -i "android\|iphone\|mobile" /logs/ssl-*.log

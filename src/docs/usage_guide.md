@@ -1,100 +1,57 @@
+# Mobile-Optimized 3Proxy Usage Guide
 
-# 3proxy Full Network Configuration Guide
-
-This guide explains how to use the various proxy services configured in this setup.
+This guide will help you set up and use the mobile-optimized version of 3Proxy.
 
 ## Available Services
 
-| Service | Port | Description |
-|---------|------|-------------|
-| SOCKS5 | 5000 | Secure SOCKS5 proxy with authentication |
-| HTTP(S) | 8080 | HTTP and HTTPS proxy |
-| DNS | 5353 | DNS proxy service |
-| SMTP | 5025 | SMTP relay service |
-| POP3 | 5110 | POP3 proxy service |
-| TCP Forward | 8888 | Example TCP port forwarding (to port 80) |
-| UDP Forward | 5353 | Example UDP port forwarding (to DNS) |
-| Tor Proxy | 5555 | Traffic routed through Tor network |
+- **HTTP Proxy**: Port 8080
+- **SOCKS5 Proxy**: Port 1080
+- **HTTPS Proxy with SSL**: Port 8443
+- **Tor Proxy**: Port 9050
 
-## Authentication
+## Mobile Client Configuration
 
-Authentication is enabled for the SOCKS5 proxy. Use the following credentials:
-- Username: `admin`
-- Password: `password123`
+### Android
 
-## Usage Examples
+1. Go to Settings → Wi-Fi
+2. Long-press your connected network
+3. Select "Modify Network"
+4. Check "Show advanced options"
+5. Change Proxy settings to "Manual"
+6. Enter the server IP and port 8080
+7. Save the configuration
 
-### SOCKS5 Proxy
+### iOS
 
-```bash
-# Using curl with SOCKS5
-curl --socks5 admin:password123@0.0.0.0:5000 http://example.com
+1. Go to Settings → Wi-Fi
+2. Tap the (i) icon next to your connected network
+3. Scroll down to "HTTP Proxy" and select "Manual"
+4. Enter the server IP and port 8080
+5. Leave Authentication blank or enter admin/mobileproxy if required
 
-# Configure Firefox to use SOCKS5
-# Settings -> Network Settings -> Manual proxy configuration
-# SOCKS Host: 0.0.0.0, Port: 5000
-```
+### Mobile Apps
 
-### HTTP Proxy
+For apps that don't use system proxy settings:
 
-```bash
-# Using curl with HTTP proxy
-curl -x http://0.0.0.0:8080 http://example.com
+1. Install a VPN app like "HTTP Injector" or "Proxifier"
+2. Configure the VPN to use our SOCKS5 proxy (port 1080)
+3. Enable the VPN to route all traffic through our proxy
 
-# Using wget with proxy
-wget -e use_proxy=yes -e http_proxy=0.0.0.0:8080 http://example.com
-```
+## Optimizations
 
-### DNS Proxy
+This 3proxy build includes:
 
-```bash
-# Query through DNS proxy
-dig @0.0.0.0 -p 5353 example.com
-
-# Configure system to use custom DNS
-# Edit /etc/resolv.conf:
-# nameserver 0.0.0.0
-```
-
-### Tor Integration
-
-Traffic sent to port 5555 will be routed through the Tor network:
-
-```bash
-# Using curl with Tor proxy
-curl -x http://0.0.0.0:5555 https://check.torproject.org/
-```
-
-## Custom TLD Configuration
-
-This setup includes a custom TLD `mytld` for internal testing:
-
-- `ns1.mytld` points to 127.0.0.1
-- `www.mytld` points to 127.0.0.1
-- `test.mytld` points to 127.0.0.1
-
-To use custom TLDs, ensure your system is configured to use the DNS proxy (port 5353).
-
-## Mobile Optimization
-
-This configuration includes TCP optimizations specifically for mobile devices:
-- TCP_NODELAY reduces latency
-- TCP_QUICKACK improves response times
-- SO_KEEPALIVE maintains connections during intermittent connectivity
-- Optimized timeouts for better battery usage
-
-## Security Considerations
-
-1. Always change the default password in a production environment
-2. Consider using firewall rules to restrict access
-3. For production, use proper SSL certificates rather than self-signed ones
-4. Review and modify logging settings for privacy and compliance
-5. Monitor logs for unusual activities
+- TCP optimization for mobile connections
+- Buffer size optimization (16KB for mobile)
+- Fast DNS lookups with caching
+- SSL support for encrypted connections
+- Tor integration for anonymous browsing
 
 ## Troubleshooting
 
-If services fail to start:
-1. Check if ports are already in use
-2. Verify permissions (some services may require root access)
-3. Check log files in `/logs/` directory
-4. Ensure Tor is running if using the Tor integration
+If you experience connection issues:
+
+1. Check that the proxy server is running
+2. Verify the correct IP and port in your configuration
+3. Try different ports (8080, 1080, 8443)
+4. Make sure the proxy is reachable from your network
