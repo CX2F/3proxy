@@ -53,11 +53,32 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd src && g++ -std=c++11 -Wall -pthread mobile_proxy.cpp -o ../bin/mobile_proxy"
+args = "mkdir -p bin obj logs"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "../bin/mobile_proxy"
+args = "cd src && make"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd .. && ./bin/mobile_proxy"
+
+[[workflows.workflow]]
+name = "Proxy-Server"
+author = 39603852
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "mkdir -p bin obj"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd src && make proxy_server"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd .. && ./bin/proxy_server"
 
 [deployment]
 run = ["sh", "-c", "cd src && ../bin/mobile_proxy"]
