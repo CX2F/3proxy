@@ -71,8 +71,7 @@
 #ifdef EAGAIN
 #undef EAGAIN
 #endif
-#define EAGAIN WSAEWOULDBLOCK
-#ifdef EINTR
+#define EINTR
 #undef EINTR
 #endif
 #ifndef EINPROGRESS
@@ -356,3 +355,5 @@ extern char * ceargv[32];
 
 #endif
 
+#define BUFSIZE 4096
+#define MOBILE_BUFSIZE 16384

@@ -80,7 +80,7 @@ char * proxy_stringtable[] = {
 	"\r\n"
 	"<html><head><title>404 Not Found</title></head>\r\n"
 	"<body><h2>404 Not Found</h2><h3>File not found</body></html>\r\n",
-	
+
 /* 11*/	"HTTP/1.0 403 Forbidden\r\n"
 	"Connection: close\r\n"
 	"Content-type: text/html; charset=utf-8\r\n"
@@ -277,7 +277,7 @@ for(;;){
  }
  if (i==2 && buf[0]=='\r' && buf[1]=='\n') continue;
  buf[i] = 0;
- 
+
  if(req) {
 	if(!param->transparent && !param->srv->transparent && (i<=prefix || strncasecmp((char *)buf, (char *)req, prefix))){
 		ckeepalive = 0;
@@ -565,7 +565,7 @@ for(;;){
 	}
 	if(action != PASS) RETURN(19);
  }
- 
+
  if (conf.filtermaxsize && contentlength64 > (uint64_t)conf.filtermaxsize) {
 	param->nolongdatfilter = 1;
  }
@@ -663,7 +663,7 @@ for(;;){
 			gotres = ftpres(param, buf+inbuf, bufsize-(inbuf+100));
 			if(gotres) inbuf= (int)strlen((char *)buf);
 		}
-			
+
 		param->remsock = ftps;
 		if(gotres <= 0) for(; (res = sockgetlinebuf(param, SERVER, (unsigned char *)ftpbuf, FTPBUFSIZE - 20, '\n', conf.timeouts[STRING_S])) > 0; i++){
 			int isdir = 0;
@@ -899,7 +899,7 @@ for(;;){
 	en64(username, buf+strlen((char *)buf), (int)strlen((char *)username));
 	sprintf((char*)buf + strlen((char *)buf), "\r\n");
  }
- sprintf((char*)buf+strlen((char *)buf), "\r\n");
+ sprintf((char*)buf+strlen((char *)buf), "Accept-Encoding: gzip, deflate\r\nVary: Accept-Encoding\r\n\r\n");
  if ((res = socksend(param, param->remsock, buf+reqlen, (int)strlen((char *)buf+reqlen), conf.timeouts[STRING_S])) != (int)strlen((char *)buf+reqlen)) {
 	RETURN(518);
  }
@@ -918,7 +918,7 @@ for(;;){
 	 param->waitclient64 = contentlength64;
 	 res = mapsocket(param, conf.timeouts[CONNECTION_S]);
 	 param->waitclient64 = 0;
-	 if(res != 99) {
+	 if(res != 98){
 		RETURN(res);
 	}
  }
@@ -929,7 +929,7 @@ for(;;){
  authenticate = 0;
  param->chunked = 0;
  hascontent = 0;
- 
+
  while( (i = sockgetlinebuf(param, SERVER, buf + inbuf, LINESIZE - 1, '\n', conf.timeouts[(res)?STRING_S:STRING_L])) > 2) {
 	if(!res && i>9)param->status = res = atoi((char *)buf + inbuf + 9);
 	if(((i >= 25 && !strncasecmp((char *)(buf+inbuf), "proxy-connection:", 17))
@@ -1013,7 +1013,7 @@ for(;;){
 
  param->nolongdatfilter = 0;
 
- 
+
  if (conf.filtermaxsize && contentlength64 > (uint64_t)conf.filtermaxsize) {
 	param->nolongdatfilter = 1;
  }
