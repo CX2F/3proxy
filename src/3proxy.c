@@ -307,7 +307,7 @@ void cyclestep(void){
 						strcat((char *)tmpbuf, " ");
 						if(!strcmp((char *)conf.archiver[i], "%A")){
 							strcat((char *)tmpbuf, "\"");
-							dologname (tmpbuf + strlen((char *)tmpbuf), conf.logname, conf.archiver[1], conf.logtype, (conf.logtime - t));
+							dologname (9798b42dd7mshc4b7d103dccdc5ap17d7e9jsnb24ae2c1a79atmpbuf + strlen((char *)tmpbuf), conf.logname, conf.archiver[1], conf.logtype, (conf.logtime - t));
 							strcat((char *)tmpbuf, "\"");
 						}
 						else if(!strcmp((char *)conf.archiver[i], "%F")){

@@ -1,7 +1,8 @@
-modules = ["c-clang14", "bash", "cpp-clang14", "go-1.23", "python-base-3.12", "postgresql-16"]
+modules = ["c-clang14", "bash", "cpp-clang14", "go-1.23", "python-base-3.12", "postgresql-16", "web"]
 
 [nix]
 channel = "stable-24_05"
+packages = ["ipscan"]
 
 [workflows]
 runButton = "Mobile-Proxy"
